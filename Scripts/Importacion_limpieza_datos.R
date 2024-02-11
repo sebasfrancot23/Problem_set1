@@ -10,7 +10,7 @@
 # Preparación del ambiente ------------------------------------------------
 rm(list=ls())
 
-libraries = c("pacman", "tidyverse", "rvest") 
+libraries = c("rvest", "tidyverse", "skimr") 
 
 if(length(setdiff(libraries, rownames(installed.packages()))) > 0){
   install.packages(setdiff(libraries, rownames(installed.packages())))
@@ -43,8 +43,12 @@ for (i in 1:chunks){
 }
 
 
+# Limpieza base de datos --------------------------------------------------
+aux = lista_aux[["chunk_1"]]
 
-
+#Se filtra la base para individuos mayores a 18 años y empleados.
+aux = aux %>%
+  filter(age>=18 & dsi == 0) #dsi indica si está empleado (0) o desempleado (1)
 
 
 
