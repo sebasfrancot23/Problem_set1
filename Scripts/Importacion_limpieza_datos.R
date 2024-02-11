@@ -44,11 +44,40 @@ for (i in 1:chunks){
 
 
 # Limpieza base de datos --------------------------------------------------
-aux = lista_aux[["chunk_1"]]
+#Función auxiliar para limpiar las bases de datos.
+Limpieza_bases = function(x){
+  
+  aux = x %>%
+    filter(age>=18 & dsi == 0) %>% #dsi indica si está empleado (0) o desempleado (1)
+    rename(Escolaridad = p6210s1, Ingresos_porhora = y_salary_m_hu, Ingresos_segundotrabajo = isaes, 
+           antiguedad_puesto = p6426, Urbano = clase, Independiente = cuentaPropia) %>% #Urbano es 1 si está en la ciudad.
+    select(directorio, secuencia_p, dominio, sex, age, Escolaridad, Ingresos_porhora,
+           hoursWorkUsual, estrato1, Independiente, Ingresos_segundotrabajo, antiguedad_puesto,
+           Urbano, formal) %>% #Variables del modelo. formal indica si paga o no seguridad social.
+    filter(!is.na(antiguedad_puesto)) #Cuando antiguedad_puesto es NA, el ingreso también lo es. 
+  
+  return(aux)
+}
 
-#Se filtra la base para individuos mayores a 18 años y empleados.
-aux = aux %>%
-  filter(age>=18 & dsi == 0) #dsi indica si está empleado (0) o desempleado (1)
+#Se aplica la función a cada base de datos.
+
+for (i in names(lista_aux)){
+  
+  #Se aplica la función
+  Base_limpia = Limpieza_bases(lista_aux[[i]])
+  
+  #Se exporta la base lista para el modelo:
+  saveRDS(Base_limpia, file = paste0(path, "Stores/", i, ".rds"))
+}
+
+
+
+
+
+
+
+
+ 
 
 
 
