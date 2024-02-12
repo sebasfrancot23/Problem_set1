@@ -30,7 +30,7 @@ dim(Tabla) #Está vacío. Pero dentro del HTML de estas páginas, en networkm se
 
 
 #Se raspa la información de internet con un loop. 
-chunks = 1 #Cuántos chunks se van a extraer.
+chunks = 10 #Cuántos chunks se van a extraer.
 lista_aux = list()
 
 for (i in 1:chunks){
@@ -60,18 +60,22 @@ Limpieza_bases = function(x){
 }
 
 #Se aplica la función a cada base de datos.
-
+j = 1
 for (i in names(lista_aux)){
   
-  #Se aplica la función
-  Base_limpia = Limpieza_bases(lista_aux[[i]])
+  if (j==1){
+    #Se aplica la función.
+    Base_limpia = Limpieza_bases(lista_aux[[i]])
+  } else {
+    #Se unen las bases de datos.
+    Base_limpia = bind_rows(Base_limpia, Limpieza_bases(lista_aux[[i]]))
+  } 
   
-  #Se exporta la base lista para el modelo:
-  saveRDS(Base_limpia, file = paste0(path, "Stores/", i, ".rds"))
+  j = j+1
 }
 
-
-
+#Se exporta la base lista para el modelo:
+saveRDS(Base_limpia, file = paste0(path, "Stores/", i, ".rds"))
 
 
 
