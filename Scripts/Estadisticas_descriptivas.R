@@ -6,6 +6,12 @@
 # Sebastian Franco Torres
 #
 #######################
+# Plan de acción: 
+# A las variables continuas sacales las estadísticas de siempre: N, media, sd, percentiles.
+# A las categóricas hace un gráfico de barras para ver el número de datos por categoría.
+# Si hay continuas con valores atípicos, hace un histograma para analizarlos mejor.
+
+
 
 
 # Preparación del ambiente ------------------------------------------------
@@ -23,11 +29,8 @@ invisible(sapply(libraries, require, character.only = TRUE,quietly = TRUE))
 path = gsub("(.+)Scripts.+","\\1",rstudioapi::getActiveDocumentContext()$path)
 
 #Se importa la base.
-<<<<<<< Updated upstream
 DB = readRDS(paste0(path,"Stores/Base_final.rds"))
-=======
-DB = readRDS(paste0(path,))
->>>>>>> Stashed changes
+
 
 
 
