@@ -37,40 +37,41 @@ continuas = c("Ingresos_porhora", "hoursWorkUsual", "antiguedad_puesto", "Escola
 DB_continuas = DB[,colnames(DB) %in% continuas]
   
 #Se calculan distintas estadísticas:
+#Número de observaciones #que no son missing
 Observations = apply(DB_continuas, MARGIN = 2, function(x){
   Non_missings = sum(!is.na(x))
   return(Non_missings)
-})
+}) 
 
-mean = apply(DB_continuas, MARGIN = 2, mean)
+#Media
+mean_aux = round(apply(DB_continuas, MARGIN = 2, mean, na.rm = TRUE),2)
 
-# Supongamos que tienes un dataframe llamado 'datos' y quieres calcular las estadísticas para la variable 'variable_a'
-# Reemplaza 'datos' y 'variable_a' con los nombres reales de tu dataframe y variable
+#SD
+sd_aux = round(apply(DB_continuas, MARGIN = 2, sd, na.rm = TRUE),2)
 
-# Calcular el número de observaciones que no son missings
-num_observaciones <- sum(!is.na(datos$variable_a))
+#Percentiles.
+percentiles = t(round(apply(DB_continuas, MARGIN = 2, quantile, na.rm = TRUE,
+                           probs = c(c(0.05, 0.25, 0.5, 0.75, 0.95))),2))
 
-# Calcular la media
-media <- mean(datos$variable_a, na.rm = TRUE)
+#En una matriz
+Estadisticas_continuas = cbind(Observations, mean_aux, sd_aux, percentiles)
+colnames(Estadisticas_continuas) = c("No. Observaciones", "Media", "Desv. Estándar", 
+                                 "Per. 5", "Per. 25", "Per. 50", "Per. 75", 
+                                 "Per 95")
+#Hacia latex
+stargazer(Estadisticas_continuas, type = "latex", title = "Estadísticas descriptivas",
+          subtitle = "variables continuas", label = "Tabla_continuas",
+          summary = FALSE)
 
-# Calcular la desviación estándar
-desviacion_estandar <- sd(datos$variable_a, na.rm = TRUE)
-
-# Calcular los percentiles 5, 25, 50, 75 y 95
-percentiles <- quantile(datos$variable_a, probs = c(0.05, 0.25, 0.5, 0.75, 0.95), na.rm = TRUE)
-
-# Crear una tabla con las estadísticas
-tabla_estadisticas <- matrix(c(num_observaciones, media, desviacion_estandar, percentiles), nrow = 1, byrow = TRUE)
-
-# Nombrar las filas y columnas de la tabla
-rownames(tabla_estadisticas) <- c("Variable_A")
-colnames(tabla_estadisticas) <- c("No. Observaciones", "Media", "Desviación Estándar", "Percentil 5", "Percentil 25", "Percentil 50", "Percentil 75", "Percentil 95")
-
-# Imprimir la tabla con stargazer
-stargazer(tabla_estadisticas, type = "text", summary = FALSE)
-
-
-
+#Histogramas de variables.
+#Función auxiliar para gráficar un histograma.
+Hist_aux = function(data, x){
+  
+  
+  
+  
+  
+}
 
 
 
