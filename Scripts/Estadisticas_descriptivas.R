@@ -23,7 +23,11 @@ invisible(sapply(libraries, require, character.only = TRUE,quietly = TRUE))
 path = gsub("(.+)Scripts.+","\\1",rstudioapi::getActiveDocumentContext()$path)
 
 #Se importa la base.
+<<<<<<< Updated upstream
 DB = readRDS(paste0(path,"Stores/Base_final.rds"))
+=======
+DB = readRDS(paste0(path,))
+>>>>>>> Stashed changes
 
 
 
