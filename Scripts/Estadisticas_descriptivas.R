@@ -63,15 +63,55 @@ stargazer(Estadisticas_continuas, type = "latex", title = "Estadísticas descrip
           subtitle = "variables continuas", label = "Tabla_continuas",
           summary = FALSE)
 
-#Histogramas de variables.
-#Función auxiliar para gráficar un histograma.
-Hist_aux = function(data, x){
-  
-  
-  
-  
-  
-}
+#Histogramas de variables continuas.
+#Antiguedad
+png(filename = paste0(path, "Views/Hist_antiguedad.png"),
+    width = 1464, height = 750)
+antiguedad_puesto = ggplot(DB, aes(x=antiguedad_puesto)) +
+  geom_histogram(binwidth = 10, fill = "skyblue", color = "black", alpha = 0.8) +
+  scale_x_continuous(n.breaks = 10, expand = c(0,0)) +
+  scale_y_continuous(n.breaks = 10, expand = c(0,0)) + 
+  labs(title = "Histograma de antiguedad_puesto", y = "Frecuencia",
+       x = "No. de meses") +
+  theme(plot.title = element_text(hjust = 0.5, size = 15),
+        axis.title.x = element_text(size = 14),
+        axis.title.y = element_text(size = 14),
+        axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        panel.grid.major = element_blank(),  
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(color = "black", size = 1))
+print(antiguedad_puesto)
+dev.off()
+
+#Ingreso
+png(filename = paste0(path, "Views/Hist_ingreso.png"),
+    width = 1464, height = 750)
+
+Ingresos = ggplot(DB, aes(x=Ingresos_porhora)) +
+  geom_histogram(fill = "skyblue", color = "black", alpha = 0.8) +
+  scale_x_continuous(n.breaks = 10, expand = c(0,0)) +
+  scale_y_continuous(n.breaks = 10, expand = c(0,0)) + 
+  labs(title = "Histograma de Ingresos_porhora", y = "Frecuencia",
+       x = "Ingreso laboral") +
+  theme(plot.title = element_text(hjust = 0.5, size = 15),
+        axis.title.x = element_text(size = 14),
+        axis.title.y = element_text(size = 14),
+        axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        panel.grid.major = element_blank(),  
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(color = "black", size = 1))
+print(Ingresos)
+
+dev.off()
+
+
+
+
+
+
+
 
 
 
