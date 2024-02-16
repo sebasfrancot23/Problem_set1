@@ -1,11 +1,11 @@
-###################################
+###
 #
 # Programación problem set 1
 # Estadísticas descriptivas.
 # Integrantes:
 # Sebastian Franco Torres
 #
-#######################
+###
 # Plan de acción: 
 # A las variables continuas sacales las estadísticas de siempre: N, media, sd, percentiles.
 # A las categóricas hace un gráfico de barras para ver el número de datos por categoría.
@@ -14,7 +14,7 @@
 # Preparación del ambiente ------------------------------------------------
 rm(list=ls())
 
-libraries = c("ggplot2", "tidyverse", "skimr", "stargazer") 
+libraries = c("ggplot2", "tidyverse", "skimr", "stargazer", "gridExtra", "ggpubr") 
 
 if(length(setdiff(libraries, rownames(installed.packages()))) > 0){
   install.packages(setdiff(libraries, rownames(installed.packages())))
@@ -32,7 +32,8 @@ DB = readRDS(paste0(path,"Stores/Base_final.rds"))
 
 # Estadísticas vars continuas ---------------------------------------------
 #Las variables continuas son.
-continuas = c("Ingresos_porhora", "hoursWorkUsual", "antiguedad_puesto", "Escolaridad")
+continuas = c("Ingresos_porhora", "hoursWorkUsual", "antiguedad_puesto", 
+              "Escolaridad", "age")
 
 DB_continuas = DB[,colnames(DB) %in% continuas]
   
@@ -71,7 +72,7 @@ antiguedad_puesto = ggplot(DB, aes(x=antiguedad_puesto)) +
   geom_histogram(binwidth = 10, fill = "skyblue", color = "black", alpha = 0.8) +
   scale_x_continuous(n.breaks = 10, expand = c(0,0)) +
   scale_y_continuous(n.breaks = 10, expand = c(0,0)) + 
-  labs(title = "Histograma de antiguedad_puesto", y = "Frecuencia",
+  labs(y = "Frecuencia",
        x = "No. de meses") +
   theme(plot.title = element_text(hjust = 0.5, size = 15),
         axis.title.x = element_text(size = 14),
@@ -85,16 +86,15 @@ print(antiguedad_puesto)
 dev.off()
 
 #Ingreso
-png(filename = paste0(path, "Views/Hist_ingreso.png"),
-    width = 1464, height = 750)
-
-Ingresos = ggplot(DB, aes(x=Ingresos_porhora)) +
+#Con toda la muestra.
+Ingresos_total = ggplot(DB, aes(x=Ingresos_porhora)) +
   geom_histogram(fill = "skyblue", color = "black", alpha = 0.8) +
   scale_x_continuous(n.breaks = 10, expand = c(0,0)) +
   scale_y_continuous(n.breaks = 10, expand = c(0,0)) + 
-  labs(title = "Histograma de Ingresos_porhora", y = "Frecuencia",
+  labs(subtitle = "Muestra completa",
+       y = "Frecuencia",
        x = "Ingreso laboral") +
-  theme(plot.title = element_text(hjust = 0.5, size = 15),
+  theme(plot.subtitle = element_text(hjust = 0.5, size = 15),
         axis.title.x = element_text(size = 14),
         axis.title.y = element_text(size = 14),
         axis.text.x = element_text(size = 10),
@@ -102,9 +102,92 @@ Ingresos = ggplot(DB, aes(x=Ingresos_porhora)) +
         panel.grid.major = element_blank(),  
         panel.grid.minor = element_blank(), 
         axis.line = element_line(color = "black", size = 1))
-print(Ingresos)
 
+Ingresos_menor_perc95 = ggplot(DB %>% 
+                                 filter(Ingresos_porhora <= percentiles["Ingresos_porhora","95%"]),
+                               aes(x=Ingresos_porhora)) +
+  geom_histogram(fill = "skyblue", color = "black", alpha = 0.8) +
+  scale_x_continuous(n.breaks = 10, expand = c(0,0)) +
+  scale_y_continuous(n.breaks = 10, expand = c(0,0)) + 
+  labs(subtitle = "Menor a percentil 95",
+       y = "Frecuencia",
+       x = "Ingreso laboral") +
+  theme(plot.subtitle = element_text(hjust = 0.5, size = 15),
+        axis.title.x = element_text(size = 14),
+        axis.title.y = element_text(size = 14),
+        axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        panel.grid.major = element_blank(),  
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(color = "black", size = 1))
+
+Ingresos_mayor_perc95 = ggplot(DB %>% 
+                                 filter(Ingresos_porhora > percentiles["Ingresos_porhora","95%"]),
+                               aes(x=Ingresos_porhora)) +
+  geom_histogram(fill = "skyblue", color = "black", alpha = 0.8) +
+  scale_x_continuous(n.breaks = 10) +
+  scale_y_continuous(n.breaks = 10, expand = c(0,0)) + 
+  labs(subtitle = "Mayor a percentil 95",
+       y = "Frecuencia",
+       x = "Ingreso laboral") +
+  theme(plot.subtitle = element_text(hjust = 0.5, size = 15),
+        axis.title.x = element_text(size = 14),
+        axis.title.y = element_text(size = 14),
+        axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        panel.grid.major = element_blank(),  
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(color = "black", size = 1)) 
+
+
+#En uno solo
+png(filename = paste0(path, "Views/Hist_ingreso.png"),
+    width = 1464, height = 750)
+ggarrange(Ingresos_total, 
+          ggarrange(Ingresos_menor_perc95, Ingresos_mayor_perc95,
+                    ncol = 2, align = "h", widths = c(1, 1)),
+          nrow = 2, heights = c(1, 1))
 dev.off()
+
+
+# Estadísticas discretas --------------------------------------------------
+#Se seleccionan las variables discretas.
+Discretas = c("sex", "estrato1", "Indepentiente", "Urbano", "formal")
+
+DB_discretas = DB[,colnames(DB) %in% Discretas]
+
+#Se hace un gráfico de barras por cada var discreta.
+aux = ggplot(DB_discretas, aes(x=as.factor(sex))) +
+  geom_bar(fill = "skyblue", color = "black", alpha = 0.8, 
+           width = 0.5) +
+  geom_text(stat = "count", aes(label = after_stat(count)), 
+            vjust = -0.5) +
+  labs(title = "Distribución variable Sexo", y = "Conteo") +
+   theme(plot.title = element_text(hjust = 0.5, size = 15),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size = 14),
+        axis.text.x = element_text(size = 14),
+        axis.text.y = element_blank(),
+        panel.grid.major = element_blank(),  
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(color = "black", size = 1)) 
+
+print(aux)  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
