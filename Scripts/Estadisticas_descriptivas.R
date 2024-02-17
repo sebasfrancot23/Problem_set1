@@ -29,6 +29,28 @@ path = gsub("(.+)Scripts.+","\\1",rstudioapi::getActiveDocumentContext()$path)
 DB = readRDS(paste0(path,"Stores/Base_final.rds"))
 
 
+# Análisis de missing values. ---------------------------------------------
+#Tabla con total de missings y proporción al total de datos.
+
+Missings_total = skim(DB[,-1:3])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Estadísticas vars continuas ---------------------------------------------
 #Las variables continuas son.
