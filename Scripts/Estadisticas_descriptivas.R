@@ -41,20 +41,13 @@ stargazer(Missings, type = "latex", title = "Valores faltantes",
 
 #En un correlograma.
 DB_aux = DB %>% 
-  mutate_all(~ifelse(!is.na(.), 1, 0)) %>%
-  select(which(apply(DB_aux, 2, sd) > 0))
+  mutate_all(~ifelse(is.na(.), 1, 0))
+DB_aux = DB_aux %>% select(which(apply(DB_aux, 2, sd) > 0))
 
 png(filename = paste0(path, "Views/Missings_corr.png"),
     width = 1464, height = 750)
 corrplot::corrplot(cor(DB_aux), type = "lower")
 dev.off()
-
-
-
-
-
-
-
 
 
 # Estadísticas vars continuas ---------------------------------------------

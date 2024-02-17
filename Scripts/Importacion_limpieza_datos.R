@@ -26,7 +26,7 @@ path = gsub("(.+)Scripts.+","\\1",rstudioapi::getActiveDocumentContext()$path)
 
 #Fíjate en la dirección de cada chunk de la base de datos.
 Tabla = "https://ignaciomsarmiento.github.io/GEIH2018_sample/page1.html" |> read_html() |> html_table()
-dim(Tabla) #Está vacío. Pero dentro del HTML de estas páginas, en networkm se encuentra la dirección de otro
+dim(Tabla) #Está vacío. Pero dentro del HTML de estas páginas, en network se encuentra la dirección de otro
 #html que sí contiene los datos.
 
 
