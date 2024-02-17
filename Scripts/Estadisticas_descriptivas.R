@@ -32,17 +32,22 @@ DB = readRDS(paste0(path,"Stores/Base_final.rds"))
 # Análisis de missing values. ---------------------------------------------
 #Tabla con total de missings y proporción al total de datos.
 
-Missings_total = skim(DB[,-1:3])
+Missings = skim(DB[,-(1:3)]) %>% select(skim_variable, n_missing)
+Missings$proporcion = round((Missings$n_missing/dim(DB)[1])*100,2)
 
+#En Latex.
+stargazer(Missings, type = "latex", title = "Valores faltantes",
+          label = "Tabla_missings", summary = FALSE)
 
+#En un correlograma.
+DB_aux = DB %>% 
+  mutate_all(~ifelse(!is.na(.), 1, 0)) %>%
+  select(which(apply(DB_aux, 2, sd) > 0))
 
-
-
-
-
-
-
-
+png(filename = paste0(path, "Views/Missings_corr.png"),
+    width = 1464, height = 750)
+corrplot::corrplot(cor(DB_aux), type = "lower")
+dev.off()
 
 
 
