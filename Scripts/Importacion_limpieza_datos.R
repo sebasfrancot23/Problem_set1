@@ -55,7 +55,10 @@ Limpieza_bases = function(x){
     select(directorio, secuencia_p, dominio, sex, age, Ingresos_porhora,
            hoursWorkUsual, Estrato, Independiente, antiguedad_puesto,
            Urbano, formal, sizeFirm, maxEducLevel) %>% #Variables del modelo. formal indica si paga o no seguridad social.
-    #filter(!is.na(antiguedad_puesto)) #Cuando antiguedad_puesto es NA, el ingreso también lo es. 
+    filter(!is.na(antiguedad_puesto)) #Los missings values no se imputan, se eliminan.
+  #¿Por qué? Todos los missings en las X son también missing en Y. Si queremos usar esas observaciones
+  #deben tener valores en ambas variables. Pero imputar tanto X como Y es lo mismo que forzar 
+  #la relación Y = f(x), así que las estimaciones no capturarían la verdadera relación causal.
   
   return(aux)
 }
@@ -76,7 +79,7 @@ for (i in names(lista_aux)){
 }
 
 #Se exporta la base lista para el modelo:
-saveRDS(Base_limpia, file = paste0(path, "Stores/Base_descriptivas.rds"))
+saveRDS(Base_limpia, file = paste0(path, "Stores/Base_final.rds"))
 
 
 

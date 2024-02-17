@@ -26,7 +26,7 @@ invisible(sapply(libraries, require, character.only = TRUE,quietly = TRUE))
 path = gsub("(.+)Scripts.+","\\1",rstudioapi::getActiveDocumentContext()$path)
 
 #Se importa la base.
-DB = readRDS(paste0(path,"Stores/Base_descriptivas.rds"))
+DB = readRDS(paste0(path,"Stores/Base_final.rds"))
 
 
 # Análisis de missing values. ---------------------------------------------
