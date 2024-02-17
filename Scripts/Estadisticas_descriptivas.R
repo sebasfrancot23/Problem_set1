@@ -32,8 +32,7 @@ DB = readRDS(paste0(path,"Stores/Base_final.rds"))
 
 # Estadísticas vars continuas ---------------------------------------------
 #Las variables continuas son.
-continuas = c("Ingresos_porhora", "hoursWorkUsual", "antiguedad_puesto", 
-              "Escolaridad", "age")
+continuas = c("Ingresos_porhora", "hoursWorkUsual", "antiguedad_puesto", "age")
 
 DB_continuas = DB[,colnames(DB) %in% continuas]
   
@@ -152,7 +151,8 @@ dev.off()
 
 # Estadísticas discretas --------------------------------------------------
 #Se seleccionan las variables discretas.
-Discretas = c("sex", "estrato1", "Indepentiente", "Urbano", "formal")
+Discretas = c("sex", "Estrato", "Independiente", "Urbano", "formal", "sizeFirm",
+              "maxEducLevel" )
 
 DB_discretas = DB[,colnames(DB) %in% Discretas]
 
