@@ -76,7 +76,7 @@ for (i in names(lista_aux)){
 }
 
 #Se exporta la base lista para el modelo:
-saveRDS(Base_limpia, file = paste0(path, "Stores/Base_final.rds"))
+saveRDS(Base_limpia, file = paste0(path, "Stores/Base_descriptivas.rds"))
 
 
 
