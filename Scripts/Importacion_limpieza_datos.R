@@ -55,7 +55,7 @@ Limpieza_bases = function(x){
     select(directorio, secuencia_p, dominio, sex, age, Ingresos_porhora,
            hoursWorkUsual, Estrato, Independiente, antiguedad_puesto,
            Urbano, formal, sizeFirm, maxEducLevel) %>% #Variables del modelo. formal indica si paga o no seguridad social.
-    filter(!is.na(antiguedad_puesto)) #Cuando antiguedad_puesto es NA, el ingreso también lo es. 
+    #filter(!is.na(antiguedad_puesto)) #Cuando antiguedad_puesto es NA, el ingreso también lo es. 
   
   return(aux)
 }
