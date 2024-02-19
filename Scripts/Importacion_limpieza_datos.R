@@ -49,17 +49,13 @@ for (i in 1:chunks){
 Limpieza_bases = function(x){
   
   aux = x %>%
-    filter(age>=18 & dsi == 0) %>% #dsi indica si está empleado (0) o desempleado (1)
+    filter(age>=18 & ocu == 1) %>% #ocu indica si está empleado (1).
     rename(Ingresos_porhora = y_salary_m_hu, antiguedad_puesto = p6426, 
            Urbano = clase, Independiente = cuentaPropia, Estrato = estrato1) %>% #Urbano es 1 si está en la ciudad.
     select(directorio, secuencia_p, dominio, sex, age, Ingresos_porhora,
            hoursWorkUsual, Estrato, Independiente, antiguedad_puesto,
            Urbano, formal, sizeFirm, maxEducLevel) %>% #Variables del modelo. formal indica si paga o no seguridad social.
-    filter(!is.na(antiguedad_puesto)) #Los missings values no se imputan, se eliminan.
-  #¿Por qué? Todos los missings en las X son también missing en Y. Si queremos usar esas observaciones
-  #deben tener valores en ambas variables. Pero imputar tanto X como Y es lo mismo que forzar 
-  #la relación Y = f(x), así que las estimaciones no capturarían la verdadera relación causal.
-  
+    
   return(aux)
 }
 
