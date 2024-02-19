@@ -72,7 +72,7 @@ dev.off()
 
 # Estimación modelo. ------------------------------------------------------
 lm_age = lm(Ingresos_porhora ~ age+age_2, DB)
-stargazer(lm_age, type = "latex") #Se exportan los resultados.
+stargazer(lm_age, type = "text") #Se exportan los resultados.
 
 #Se calcula el MSE del modelo.
 length(predict(lm_age, newdata = DB)) 

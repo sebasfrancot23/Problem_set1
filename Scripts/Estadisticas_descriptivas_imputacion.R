@@ -82,7 +82,7 @@ colnames(Estadisticas_continuas) = c("No. Observaciones", "Media", "Desv. Están
 stargazer(Estadisticas_continuas, type = "latex", title = "Estadísticas descriptivas",
           subtitle = "variables continuas", label = "Tabla_continuas",
           summary = FALSE)
-
+ 
 #Histogramas de variables continuas.
 #Antiguedad
 png(filename = paste0(path, "Views/Hist_antiguedad.png"),
