@@ -49,14 +49,13 @@ for (i in 1:chunks){
 Limpieza_bases = function(x){
   
   aux = x %>%
-    filter(age>=18 & dsi == 0) %>% #dsi indica si está empleado (0) o desempleado (1)
+    filter(age>=18 & ocu == 1) %>% #ocu indica si está empleado (1).
     rename(Ingresos_porhora = y_salary_m_hu, antiguedad_puesto = p6426, 
            Urbano = clase, Independiente = cuentaPropia, Estrato = estrato1) %>% #Urbano es 1 si está en la ciudad.
     select(directorio, secuencia_p, dominio, sex, age, Ingresos_porhora,
            hoursWorkUsual, Estrato, Independiente, antiguedad_puesto,
            Urbano, formal, sizeFirm, maxEducLevel) %>% #Variables del modelo. formal indica si paga o no seguridad social.
-    #filter(!is.na(antiguedad_puesto)) #Cuando antiguedad_puesto es NA, el ingreso también lo es. 
-  
+    
   return(aux)
 }
 
