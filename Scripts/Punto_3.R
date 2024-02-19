@@ -75,9 +75,42 @@ lm_age = lm(Ingresos_porhora ~ age+age_2, DB)
 stargazer(lm_age, type = "text") #Se exportan los resultados.
 
 #Se calcula el MSE del modelo.
-length(predict(lm_age, newdata = DB)) 
+DB_aux = DB[!is.na(DB$Ingresos_porhora),]
+predicciones = predict(lm_age, newdata = DB_aux)
 
-length(predict(lm_age, newdata = DB[!is.na(DB$Ingresos_porhora),])) 
+MSE = mean((DB_aux$Ingresos_porhora - predicciones))^2 
+
+#En una matriz.
+aux = summary(lm_age)
+Errores = data.frame(R_2 = aux$adj.r.squared,
+                 MSE = MSE,
+                 RMSE = sqrt(MSE)) #Saquemos el root de paso.
+#Hacia latex.
+stargazer(Errores, type = "text", title = "Medidas de ajuste", 
+          subtitle = "dentro de muestra")
+
+#Las predicciones de forma gráfica.
+DB_predict = data.frame(age = DB_aux$age,
+                    Ingresos_porhora = DB_aux$Ingresos_porhora,
+                    Predicciones = predicciones)
+#El gráfico
+png(filename = paste0(path, "Views/Scatter_age_ingresos_prediccion.png"),
+    width = 1464, height = 750)
+ggplot(DB_predict, aes(x = age, y = Ingresos_porhora/1000)) +
+  geom_point(color = "blue") +  
+  geom_line(aes(y = predicciones/1000), size = 2) + 
+  labs(y = "Ingreso por hora", x = "Edad", caption = "Cifras en miles de pesos.") +
+  scale_y_continuous(n.breaks = 6) +
+  theme(plot.title = element_text(hjust = 0.5, size = 15),
+        plot.caption = element_text(size = 15),
+        axis.title.x = element_text(size = 14),
+        axis.title.y = element_text(size = 14),
+        axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        panel.grid.major = element_blank(),  
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(color = "black", size = 1))
+dev.off()                  
 
 
 
