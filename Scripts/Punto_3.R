@@ -91,7 +91,7 @@ aux = summary(lm_age)
 Errores = data.frame(Nombres = c("R cuadrado ajustado", "MSE", "RMSE"),
                      Estadistico = c(aux$adj.r.squared, MSE, sqrt(MSE)))
 #Hacia latex.
-stargazer(t(Errores), type = "text", title = "Medidas de ajuste", 
+stargazer(Errores, type = "text", title = "Medidas de ajuste", 
           subtitle = "dentro de muestra", keep = c(1,3), 
           column.labels = c("Estadístico", "Valor"),
           align = T)
@@ -184,14 +184,14 @@ Function_to_boot = function(data, index){
 }
 
 #Los resultados del bootstrap.
-Bootstrap = boot(DB, Function_to_boot, R = 10)
+Bootstrap = boot(DB, Function_to_boot, R = 10000)
 
 #Se crea un histograma con la distribución empírica del estimador. 
 Resultados_boot = data.frame("Simulación" = 1:Bootstrap$R,
            "Estimación" = Bootstrap$t)
 
 #Para resaltar en el gráfico los intervalos de confianza.
-Percentiles = quantile(Bootstrap$t, c(0.025, 0.0975))
+Percentiles = quantile(Bootstrap$t, c(0.025, 0.975))
 names(Percentiles) = NULL
 png(filename = paste0(path, "Views/Hist_bootstrap.png"),
     width = 1464, height = 750)
