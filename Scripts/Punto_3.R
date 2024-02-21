@@ -81,15 +81,18 @@ stargazer(lm_age, type = "text") #Se exportan los resultados.
 
 #Se calcula el MSE del modelo.
 DB_aux = DB[!is.na(DB$Ingresos_porhora),]
-predicciones = predict(lm_age, newdata = DB_aux) |> exp() #En niveles.  
+predicciones_log = predict(lm_age, newdata = DB_aux)
+predicciones_niveles = predict(lm_age, newdata = DB_aux) |> exp() #En niveles.  
  
 
-MSE = mean((DB_aux$Ingresos_porhora - predicciones))^2 
+MSE_log = mean((DB_aux$log_ingresos_porhora - predicciones_log))^2 
+MSE_niveles = mean((DB_aux$Ingresos_porhora - predicciones_niveles))^2
 
 #En una matriz.
 aux = summary(lm_age)
 Errores = data.frame(Nombres = c("R cuadrado ajustado", "MSE", "RMSE"),
-                     Estadistico = c(aux$adj.r.squared, MSE, sqrt(MSE)))
+                     Estadistico = c(aux$adj.r.squared, MSE_niveles, 
+                                     sqrt(MSE_niveles)))
 #Hacia latex.
 stargazer(Errores, type = "text", title = "Medidas de ajuste", 
           subtitle = "dentro de muestra", keep = c(1,3), 
@@ -99,7 +102,7 @@ stargazer(Errores, type = "text", title = "Medidas de ajuste",
 #Las predicciones de forma gráfica.
 DB_predict = data.frame(age = DB_aux$age,
                     Ingresos_porhora = DB_aux$Ingresos_porhora,
-                    Predicciones = predicciones)
+                    Predicciones = predicciones_niveles)
 
 #El valor de edad que máxima el salario.
 Age_max = unique(DB_predict[DB_predict$Predicciones == max(DB_predict$Predicciones), "age"])
@@ -109,7 +112,7 @@ png(filename = paste0(path, "Views/Scatter_age_ingresos_prediccion.png"),
     width = 1464, height = 750)
 ggplot(DB_predict, aes(x = age, y = Ingresos_porhora/1000)) +
   geom_point(color = "blue") +  
-  geom_line(aes(y = predicciones/1000), size = 2) + 
+  geom_line(aes(y = predicciones_niveles/1000), size = 2) + 
   geom_vline(xintercept = Age_max, linetype = "dashed", color = "red") +
   labs(y = "Ingreso por hora", x = "Edad", caption = "Cifras en miles de pesos.") +
   scale_y_continuous(n.breaks = 6) +
@@ -140,7 +143,7 @@ png(filename = paste0(path, "Views/Efecto_edad_ingresos.png"),
 ggplot(DB_aux, aes(x = age, y = Efecto_marginal)) +
   geom_line(size = 1, color = "blue") + 
   geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
-  geom_vline(xintercept = Age_max+0.6, linetype = "dashed", color = "red") +
+  geom_vline(xintercept = Age_max, linetype = "dashed", color = "red") +
   geom_text(aes(label = ifelse(age == Age_max, paste0(as.character(Age_max), " años")
                                , "")), vjust = -0.3, hjust = -0.2, color = "black") +
   labs(title = "Semielasticidad del ingreso contra la edad" ,
