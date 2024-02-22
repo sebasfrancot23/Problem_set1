@@ -216,8 +216,7 @@ Age_max_male = unique(DB_male[DB_male$Pred == max(DB_male$Prediccion_salario), "
 Age_max_female = unique(DB_female[DB_female$Pred == max(DB_female$Prediccion_salario), "age"])
 
 #El gráfico.
-DB %>% arrange(Prediccion_salario) %>% 
-  mutate(id =1:nrow(DB)) %>%
+DB %>% 
   ggplot(aes(x = age, y = Prediccion_salario, group = as.factor(sex), 
              color = as.factor(sex))) +
   geom_line()
