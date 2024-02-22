@@ -54,7 +54,7 @@ Limpieza_bases = function(x){
            Urbano = clase, Independiente = cuentaPropia, Estrato = estrato1) %>% #Urbano es 1 si está en la ciudad.
     select(directorio, secuencia_p, dominio, sex, age, Ingresos_porhora,
            hoursWorkUsual, Estrato, Independiente, antiguedad_puesto,
-           Urbano, formal, sizeFirm, maxEducLevel) %>% #Variables del modelo. formal indica si paga o no seguridad social.
+           Urbano, formal, sizeFirm, maxEducLevel, oficio) %>% #Variables del modelo. formal indica si paga o no seguridad social.
     
   return(aux)
 }
