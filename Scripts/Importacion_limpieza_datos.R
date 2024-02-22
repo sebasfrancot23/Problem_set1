@@ -74,6 +74,18 @@ for (i in names(lista_aux)){
   j = j+1
 }
 
+
+# Imputación missings values ----------------------------------------------
+#Los missings values no se imputan, se eliminan.
+#¿Por qué? Todos los missings en las X son también missing en Y. Si queremos usar esas observaciones
+#deben tener valores en ambas variables. Pero imputar tanto X como Y es lo mismo que forzar 
+#la relación Y = f(x), así que las estimaciones no capturarían la verdadera relación causal.
+
+#Excepto por este muchacho en maxEducLevel.
+Base_limpia = Base_limpia %>% mutate(maxEducLevel = 
+                                       ifelse(is.na(maxEducLevel), mean(maxEducLevel, na.rm = T), 
+                                              maxEducLevel))
+
 #Se exporta la base lista para el modelo:
 saveRDS(Base_limpia, file = paste0(path, "Stores/Base_final.rds"))
 

@@ -54,12 +54,42 @@ ggplot(DB, aes(x = as.factor(sex), y = Ingresos_porhora/1000)) +
 dev.off()
 
 #Se estima el modelo sencillo.
+DB = DB[!is.na(DB$Ingresos_porhora),]
+
 lm_sex =lm(log_ingresos_porhora ~ sex, DB)
 stargazer(lm_sex, type = "text")
 
 #Modelo más completo.
+#Se crea la edad al cuadrado.
+DB = DB %>% mutate(age_2 = age^2)
 
+#Se específica que las variables categóricas son de este tipo.
+Vars_categoricas = c("sizeFirm", "maxEducLevel", "oficio")
+for (i in Vars_categoricas){
+  DB[[i]] = factor(DB[[i]])
+}
 
+#Primero sin aplicar FWL.
+lm_sex_completo = lm(log_ingresos_porhora ~ sex+age+age_2 + maxEducLevel + 
+                       oficio + sizeFirm, data = DB)
+#Para comparar, se conserva el coeficiente de sex.
+Efecto_sex = lm_sex_completo$coefficients[2]
+
+#Ahora se aplica FWL.
+#Se eliminan los efectos de las demás X sobre sex.
+sex_aux = lm(sex ~ age+age_2 + maxEducLevel + 
+               oficio + sizeFirm, data = DB)
+#Sobre Y.
+Ingreso_aux = lm(log_ingresos_porhora ~ age+age_2 + maxEducLevel + 
+                   oficio + sizeFirm, data = DB)
+
+#Se guardan los residuales de cada regresión auxiliar.
+DB$Resid_sex_aux = sex_aux$residuals
+DB$Resid_Ingreso_aux = Ingreso_aux$residuals
+
+#Se realiza la segunda etapa de FWL.
+FWL_sex = lm(Resid_Ingreso_aux ~ Resid_sex_aux, data = DB)
+stargazer(FWL_sex, type = "text")
 
 
 

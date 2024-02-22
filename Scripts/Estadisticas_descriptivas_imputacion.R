@@ -201,12 +201,6 @@ for (i in colnames(DB_discretas)){
 }
 
 
-# Imputación missings values ----------------------------------------------
-#filter(!is.na(antiguedad_puesto)) #Los missings values no se imputan, se eliminan.
-#¿Por qué? Todos los missings en las X son también missing en Y. Si queremos usar esas observaciones
-#deben tener valores en ambas variables. Pero imputar tanto X como Y es lo mismo que forzar 
-#la relación Y = f(x), así que las estimaciones no capturarían la verdadera relación causal.
-
 
 
 
