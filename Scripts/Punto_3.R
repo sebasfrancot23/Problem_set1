@@ -94,10 +94,7 @@ Errores = data.frame(Nombres = c("R cuadrado ajustado", "MSE", "RMSE"),
                      Estadistico = c(aux$adj.r.squared, MSE_niveles, 
                                      sqrt(MSE_niveles)))
 #Hacia latex.
-stargazer(Errores, type = "text", title = "Medidas de ajuste", 
-          subtitle = "dentro de muestra", keep = c(1,3), 
-          column.labels = c("Estadístico", "Valor"),
-          align = T)
+xtable::xtable(Errores)
 
 #Las predicciones de forma gráfica.
 DB_predict = data.frame(age = DB_aux$age,
@@ -176,8 +173,8 @@ Max_find = function(lm_object, data){
 #La función para emplear en bootstrap.
 Function_to_boot = function(data, index){
   #Se corre el modelo y se guardan los coeficientes.
-  lm_aux = (lm(log_ingresos_porhora ~ age+age_2, 
-                         data = data, subset = index))
+  lm_aux = lm(log_ingresos_porhora ~ age+age_2, 
+                         data = data, subset = index)
   
   #Se emplea la función auxiliar para encontrar la raíz en la elasticidad.
   optimo = Max_find(lm_aux, data = data)
