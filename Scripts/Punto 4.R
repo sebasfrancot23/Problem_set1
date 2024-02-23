@@ -9,8 +9,13 @@
 
 
 # Preparación del ambiente ------------------------------------------------
-rm(list=ls())
+rm(list=setdiff(ls(), c("lm_age")))
 
+
+rm(list = setdiff(ls(), c("Lineal", "GraficoB", "Graficas_macro", "Fun_Ban", 
+                          "Grafico_T", "Fun_FED", "Formato_TRM", "Grafico", 
+                          "Fun_Bancos", "Grafica_Bancos", "FED_tasas", 
+                          "Grafica_probas", "T_graph", "Spread", "Graficos_B")))
 
 libraries = c("ggplot2", "tidyverse", "stats", "stargazer", "boot") 
 
@@ -253,7 +258,7 @@ DB$Prediccion_salario = predict(lm_aux, newdata = DB) |> exp()
 
 #En donde está la edad que maximiza el salario. 
 Age_max_male = Max_find(lm_aux, data = DB, female = F)
-Age_max_female = optimo = Max_find(lm_aux, data = DB, female = T)
+Age_max_female = Max_find(lm_aux, data = DB, female = T)
 
 #El gráfico.
 png(filename = paste0(path, "Views/Perfil_ingresos_edad.png"),
