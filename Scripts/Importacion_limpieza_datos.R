@@ -83,7 +83,8 @@ for (i in names(lista_aux)){
 
 #Excepto por este muchacho en maxEducLevel.
 Base_limpia = Base_limpia %>% mutate(maxEducLevel = 
-                                       ifelse(is.na(maxEducLevel), mean(maxEducLevel, na.rm = T), 
+                                       ifelse(is.na(maxEducLevel), 
+                                              round(mean(maxEducLevel, na.rm = T),0), 
                                               maxEducLevel))
 
 #Se exporta la base lista para el modelo:

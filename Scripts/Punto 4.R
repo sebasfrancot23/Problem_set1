@@ -55,10 +55,7 @@ dev.off()
 
 #Se estima el modelo sencillo.
 DB = DB[!is.na(DB$Ingresos_porhora),]
-
 lm_sex =lm(log_ingresos_porhora ~ sex, DB)
-stargazer(lm_sex, type = "text")
-
 
 # Punto b. ----------------------------------------------------------------
 #Modelo más completo.
@@ -74,8 +71,6 @@ for (i in Vars_categoricas){
 #Primero sin aplicar FWL.
 lm_sex_completo = lm(log_ingresos_porhora ~ sex+age+age_2 + maxEducLevel + 
                        oficio + sizeFirm, data = DB)
-#Para comparar, se conserva el coeficiente de sex.
-Efecto_sex = lm_sex_completo$coefficients[2]
 
 #Ahora se aplica FWL.
 #Se eliminan los efectos de las demás X sobre sex.
@@ -86,12 +81,14 @@ Ingreso_aux = lm(log_ingresos_porhora ~ age+age_2 + maxEducLevel +
                    oficio + sizeFirm, data = DB)
 
 #Se guardan los residuales de cada regresión auxiliar.
-DB$Resid_sex_aux = sex_aux$residuals
+DB$Resid_sex = sex_aux$residuals
 DB$Resid_Ingreso_aux = Ingreso_aux$residuals
 
 #Se realiza la segunda etapa de FWL.
-FWL_sex = lm(Resid_Ingreso_aux ~ Resid_sex_aux, data = DB)
-stargazer(FWL_sex, type = "text")
+FWL_sex = lm(Resid_Ingreso_aux ~ Resid_sex, data = DB)
+
+#Hacia latex
+stargazer(lm_sex, FWL_sex, type = "text")
 
 # Punto b, bootstrap ------------------------------------------------------
 #Se define la función para emplear en bootstrap.
@@ -120,7 +117,7 @@ Resultados_boot_sex = boot(DB, Function_to_boot, R = 10)
 #Algunos resultados en una tabla.
 resultados_FWL = data.frame(Método = c("Regresión múltiple", "FWL", 
                                        "FWL con bootstrap"),
-                            Estimador_sex = c(round(Efecto_sex,4), 
+                            Estimador_sex = c(round(lm_sex_completo$coefficients[2],4), 
                                               round(FWL_sex$coefficients[2],4),
                                               round(mean(Resultados_boot_sex$t),
                                                     4)),
@@ -150,16 +147,16 @@ MG_edad = function(Data, lm_object, female){
   return(Efecto)
 }
 
+#Se define la función encuentra la raíz en el polonimo del efecto marginal.
+Max_find = function(lm_object, data, female){
+  aux = uniroot(MG_edad, interval = c(min(data$age), max(data$age)), 
+                lm_object = lm_object, female = female)
+  return(aux[["root"]])
+}
+
 #Nuevamente, se define una función que realice el proceso de bootstrap.
 Age_max_bootstap_female = function(data, index){
-  
-  #Se define la función encuentra la raíz en el polonimo del efecto marginal.
-  Max_find = function(lm_object, data, female){
-    aux = uniroot(MG_edad, interval = c(min(data$age), max(data$age)), 
-                  lm_object = lm_object, female = female)
-    return(aux[["root"]])
-  }
-  
+
   #Se corre el modelo con la submuestra del bootstrap.
   lm_aux = lm(log_ingresos_porhora ~ sex+age+age_2 + age*sex + maxEducLevel + 
                 oficio + sizeFirm, data = data, subset = index)
@@ -170,13 +167,6 @@ Age_max_bootstap_female = function(data, index){
   return(optimo)
 }
 Age_max_bootstap_male = function(data, index){
-  
-  #Se define la función encuentra la raíz en el polonimo del efecto marginal.
-  Max_find = function(lm_object, data, female){
-    aux = uniroot(MG_edad, interval = c(min(data$age), max(data$age)), 
-                  lm_object = lm_object, female = female)
-    return(aux[["root"]])
-  }
   
   #Se corre el modelo con la submuestra del bootstrap.
   lm_aux = lm(log_ingresos_porhora ~ sex+age+age_2 + age*sex + maxEducLevel + 
@@ -201,35 +191,86 @@ names(IC_female) = NULL
 names(IC_male) = NULL 
 
 #Se hace un gráfico de las predicciones, edad máxima e intervalos de confianza por sexo.
-
 #Primero la predicción sin discriminar.
 lm_aux = lm(log_ingresos_porhora ~ sex+age+age_2 + age*sex + maxEducLevel + 
               oficio + sizeFirm, data = DB)
-DB$Prediccion_salario = predict(lm_aux, newdata = DB) |> exp()
+
+#este modelo solo tiene variables categóricas, la única continua es age.
+#Se obtiene una sub base para calcular las modas.
+DB_categoricas = DB[,c("sizeFirm", "maxEducLevel", "oficio")]
+
+#Se calcula la moda por variable
+modas = apply(DB_categoricas, 2, function(x){
+  aux = names(which.max(table(x))) |> as.numeric()
+  return(aux)
+})
+
+#se extrae el coeficiente de la categoría que más se repite por variable 
+#(la moda):
+coeficientes = list()
+for (i in 1:length(modas)){
+  #Para buscar el coeficiente.
+  nombre_aux = paste0(names(modas[i]),modas[i])
   
-#Se divide la muestra.
-DB_female = filter(DB, sex==1)
-DB_male = filter(DB, sex == 0)
+  coeficientes[[nombre_aux]] = lm_aux$coefficients[nombre_aux]
+}
+
+#Se define una función auxiliar para calcular el perfil edad-salario por género.
+#Función auxiliar del salario con los coeficientes estimados.
+salario = function(age, female, lm_object, coef){
+    
+    if(female==1){
+      
+      perfil_log = lm_object$coefficients["(Intercept)"] + lm_object$coefficients["sex"]+ 
+        lm_object$coefficients["age"]*age + lm_object$coefficients["age_2"]*age^2 +
+        lm_object$coefficients["sex:age"]*age + coef[[1]] + 
+        coef[[2]] + coef[[3]]
+      names(perfil_log) = NULL
+      
+    } else {
+      
+      perfil_log = lm_object$coefficients["(Intercept)"] + lm_object$coefficients["age"]*age + 
+        lm_object$coefficients["age_2"]*age^2 + coef[[1]] + 
+        coef[[2]] + coef[[3]]
+      names(perfil_log) = NULL
+      
+    }
+    return(exp(perfil_log))
+}
+
+#Se evalúa la función en cada observación.
+DB$perfil_w_edad = rep(NA, nrow(DB))
+for (i in 1:nrow(DB)) {
+  
+  DB[i, "perfil_w_edad"] = salario(DB[i,"age"], DB[i,"sex"] ,
+                                   lm_aux, coeficientes)
+  
+}
+
+
+#Para calcular la edad que maximice el salario por género se divide la muestra.
+DB$Prediccion_salario = predict(lm_aux, newdata = DB) |> exp() 
 
 #En donde está la edad que maximiza el salario. 
-Age_max_male = unique(DB_male[DB_male$Pred == max(DB_male$Prediccion_salario), "age"])
-Age_max_female = unique(DB_female[DB_female$Pred == max(DB_female$Prediccion_salario), "age"])
+Age_max_male = Max_find(lm_aux, data = DB, female = F)
+Age_max_female = optimo = Max_find(lm_aux, data = DB, female = T)
 
 #El gráfico.
-DB %>% arrange(Prediccion_salario) %>% 
-  mutate(id =1:nrow(DB)) %>%
-  ggplot(aes(x = age, y = Prediccion_salario, group = as.factor(sex), 
-             color = as.factor(sex))) +
-  geom_line()
-
-  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
-  geom_vline(xintercept = Age_max, linetype = "dashed", color = "red") +
-  geom_text(aes(label = ifelse(age == Age_max, paste0(as.character(Age_max), " años")
-                               , "")), vjust = -0.3, hjust = -0.2, color = "black") +
-  labs(title = "Semielasticidad del ingreso contra la edad" ,
-       y = "Semielasticidad", x = "Edad") +
-  scale_y_continuous(n.breaks = 6, expand = c(0,0)) +
-  scale_x_continuous(n.breaks = 6, expand = c(0,0)) +
+png(filename = paste0(path, "Views/Perfil_ingresos_edad.png"),
+    width = 1464, height = 750)
+ggplot(DB, aes(x = age, group = as.factor(sex), color = as.factor(sex))) +
+  geom_line(aes(y = perfil_w_edad/1000), size = 1.5) + #Ahora el IC de los hombres
+  geom_vline(xintercept = Age_max_male, linetype = "solid", color = "darkred") +
+  geom_vline(xintercept = IC_male[1], linetype = "dashed", color = "darkred") +
+  geom_vline(xintercept = IC_male[2], linetype = "dashed", color = "darkred") +
+  #Ahora las mujeres
+  geom_vline(xintercept = Age_max_female, linetype = "solid", color = "orange") +
+  geom_vline(xintercept = IC_female[1], linetype = "dashed", color = "orange") +
+  geom_vline(xintercept = IC_female[2], linetype = "dashed", color = "orange") +
+  scale_color_manual(values = c("darkred","orange"), name = "Género", 
+                     labels = c("Hombre", "Mujer")) +
+  scale_x_continuous(n.breaks = 8) +
+  labs(y = "Ingresos por hora", x = "Edad", caption = "Cifras en miles de pesos.") +
   theme(plot.title = element_text(hjust = 0.5, size = 15),
         plot.caption = element_text(size = 15),
         axis.title.x = element_text(size = 14),
@@ -239,15 +280,17 @@ DB %>% arrange(Prediccion_salario) %>%
         panel.grid.major = element_blank(),  
         panel.grid.minor = element_blank(), 
         axis.line = element_line(color = "black", size = 1))
-
-
-
-
-
-
-
-
-
+dev.off()
+  
+#En una tabla esos resultados:
+Resultados_boot = data.frame("Género" = c("Hombre", "Mujer"),
+                             "Edad óptima" = c(Age_max_male, Age_max_female),
+                             "IC. 95%" = c(paste0(round(IC_male[1],0), ", "
+                                                  , round(IC_male[2],0)),
+                                           paste0(round(IC_female[1],0), ", "
+                                                  , round(IC_female[2],0))))
+                            
+                                         
 
 
 
