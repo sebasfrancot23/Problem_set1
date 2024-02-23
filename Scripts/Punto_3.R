@@ -184,7 +184,7 @@ Function_to_boot = function(data, index){
 }
 
 #Los resultados del bootstrap.
-Bootstrap = boot(DB, Function_to_boot, R = 10)
+Bootstrap = boot(DB, Function_to_boot, R = 10000)
 
 #Se crea un histograma con la distribución empírica del estimador. 
 Resultados_boot = data.frame("Simulación" = 1:Bootstrap$R,

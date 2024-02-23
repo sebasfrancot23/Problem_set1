@@ -127,7 +127,7 @@ ctrl = trainControl("LOOCV")
 CV_completo = train(log_ingresos_porhora ~ sex + age+ 
         hoursWorkUsual + as.factor(Estrato) + Independiente +
         antiguedad_puesto + formal + sizeFirm + maxEducLevel, 
-      data = DB[1:100, ], method = "lm", trControl = ctrl)
+      data = DB[1:nrow(DB), ], method = "lm", trControl = ctrl)
 
 #Para correr los polinomios se crean las transformaciones de las variables.
 DB = DB %>% 
@@ -147,7 +147,7 @@ CV_polinomios = train(log_ingresos_porhora ~ sex + age + age_2 + age_3 + age_4 +
                         antiguedad_puesto + antiguedad_puesto_2 + 
                         antiguedad_puesto_3 + antiguedad_puesto_4 +
                         antiguedad_puesto_5 + formal + sizeFirm + maxEducLevel, 
-                      data = DB[1:100, ], method = "lm", trControl = ctrl)
+                      data = DB[1:nrow(DB), ], method = "lm", trControl = ctrl)
 #Se extraen los RMSE de los CV.
 Mejores_modelos = data.frame("Nombres" = c("Lm Completo", "Polinomios"),
                              "RMSE validación" = c(RMSE_completo, 
