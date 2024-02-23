@@ -75,15 +75,15 @@ for (i in Vars_categoricas){
 
 #Primero sin aplicar FWL.
 lm_sex_completo = lm(log_ingresos_porhora ~ sex+age+age_2 + maxEducLevel + 
-                       oficio + sizeFirm, data = DB)
+                       sizeFirm, data = DB)
 
 #Ahora se aplica FWL.
 #Se eliminan los efectos de las demás X sobre sex.
 sex_aux = lm(sex ~ age+age_2 + maxEducLevel + 
-               oficio + sizeFirm, data = DB)
+               sizeFirm, data = DB)
 #Sobre Y.
 Ingreso_aux = lm(log_ingresos_porhora ~ age+age_2 + maxEducLevel + 
-                   oficio + sizeFirm, data = DB)
+                   sizeFirm, data = DB)
 
 #Se guardan los residuales de cada regresión auxiliar.
 DB$Resid_sex = sex_aux$residuals
@@ -101,10 +101,10 @@ Function_to_boot = function(data, index){
   
   #Se eliminan los efectos de las demás X sobre sex.
   sex_aux = lm(sex ~ age+age_2 + maxEducLevel + 
-                 oficio + sizeFirm, data = data, subset = index)
+                 sizeFirm, data = data, subset = index)
   #Sobre Y.
   Ingreso_aux = lm(log_ingresos_porhora ~ age+age_2 + maxEducLevel + 
-                      oficio + sizeFirm, data = data, subset = index)
+                       sizeFirm, data = data, subset = index)
   
   #Se guardan los residuales de cada regresión auxiliar.
   data$Resid_sex_aux = sex_aux$residuals
@@ -164,7 +164,7 @@ Age_max_bootstap_female = function(data, index){
 
   #Se corre el modelo con la submuestra del bootstrap.
   lm_aux = lm(log_ingresos_porhora ~ sex+age+age_2 + age*sex + maxEducLevel + 
-                oficio + sizeFirm, data = data, subset = index)
+               sizeFirm, data = data, subset = index)
   
   #Se emplea la función auxiliar para encontrar la raíz en la elasticidad.
   optimo = Max_find(lm_aux, data = data, female = T)
@@ -175,7 +175,7 @@ Age_max_bootstap_male = function(data, index){
   
   #Se corre el modelo con la submuestra del bootstrap.
   lm_aux = lm(log_ingresos_porhora ~ sex+age+age_2 + age*sex + maxEducLevel + 
-                oficio + sizeFirm, data = data, subset = index)
+                sizeFirm, data = data, subset = index)
   
   #Se emplea la función auxiliar para encontrar la raíz en la elasticidad.
   optimo = Max_find(lm_aux, data = data, female = F)
@@ -198,7 +198,7 @@ names(IC_male) = NULL
 #Se hace un gráfico de las predicciones, edad máxima e intervalos de confianza por sexo.
 #Primero la predicción sin discriminar.
 lm_aux = lm(log_ingresos_porhora ~ sex+age+age_2 + age*sex + maxEducLevel + 
-              oficio + sizeFirm, data = DB)
+               sizeFirm, data = DB)
 
 #este modelo solo tiene variables categóricas, la única continua es age.
 #Se obtiene una sub base para calcular las modas.
@@ -229,14 +229,14 @@ salario = function(age, female, lm_object, coef){
       perfil_log = lm_object$coefficients["(Intercept)"] + lm_object$coefficients["sex"]+ 
         lm_object$coefficients["age"]*age + lm_object$coefficients["age_2"]*age^2 +
         lm_object$coefficients["sex:age"]*age + coef[[1]] + 
-        coef[[2]] + coef[[3]]
+        coef[[2]] #+ coef[[3]]
       names(perfil_log) = NULL
       
     } else {
       
       perfil_log = lm_object$coefficients["(Intercept)"] + lm_object$coefficients["age"]*age + 
         lm_object$coefficients["age_2"]*age^2 + coef[[1]] + 
-        coef[[2]] + coef[[3]]
+        coef[[2]] #+ coef[[3]]
       names(perfil_log) = NULL
       
     }
@@ -294,7 +294,7 @@ Resultados_boot = data.frame("Género" = c("Hombre", "Mujer"),
                                                   , round(IC_male[2],0)),
                                            paste0(round(IC_female[1],0), ", "
                                                   , round(IC_female[2],0))))
-                            
+xtable::xtable(Resultados_boot)                          
                                          
 
 
