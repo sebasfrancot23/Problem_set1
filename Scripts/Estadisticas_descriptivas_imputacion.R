@@ -39,7 +39,7 @@ Missings$proporcion = round((Missings$n_missing/dim(DB)[1])*100,2)
 stargazer(Missings, type = "latex", title = "Valores faltantes",
           label = "Tabla_missings", summary = FALSE)
 
-saveRDS(paste0(path,"Stores/analisis_Missings.rds"))
+saveRDS(Missings, paste0(path,"Stores/analisis_Missings.rds"))
 
 #En un correlograma.
 DB_aux = DB %>% 
@@ -85,7 +85,7 @@ stargazer(Estadisticas_continuas, type = "latex", title = "Estadísticas descrip
           subtitle = "variables continuas", label = "Tabla_continuas",
           summary = FALSE)
 
-saveRDS(paste0(path,"Stores/Estadisticas_vars_continuas.rds"))
+saveRDS(Estadisticas_continuas, paste0(path,"Stores/Estadisticas_vars_continuas.rds"))
  
 #Histogramas de variables continuas.
 #Antiguedad

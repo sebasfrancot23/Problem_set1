@@ -24,11 +24,6 @@ path = gsub("(.+)Scripts.+","\\1",rstudioapi::getActiveDocumentContext()$path)
 
 #Se define una semilla
 set.seed(398759)
-DB = readRDS(paste0(path,"Stores/Base_final.rds"))
-#Se calcula el logaritmo natural del salario.
-DB$log_ingresos_porhora = log(DB$Ingresos_porhora)
-DB$age_2 = DB$age^2
-#Se estima el modelo sencillo.
 
 
 # Punto a. ----------------------------------------------------------------

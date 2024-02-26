@@ -31,7 +31,7 @@ dim(Tabla) #Está vacío. Pero dentro del HTML de estas páginas, en network se 
 
 
 #Se raspa la información de internet con un loop. 
-chunks = 1 #Cuántos chunks se van a extraer.
+chunks = 10 #Cuántos chunks se van a extraer.
 lista_aux = list()
 
 for (i in 1:chunks){
@@ -55,8 +55,8 @@ Limpieza_bases = function(x){
     #Urbano es 1 si está en la ciudad.
     select(directorio, secuencia_p, dominio, sex, age, Ingresos_porhora,
            hoursWorkUsual, Estrato, Independiente, antiguedad_puesto,
-           Urbano, formal, sizeFirm, maxEducLevel, oficio) %>%
-    filter(!is.na(Ingresos_porhora))
+           Urbano, formal, sizeFirm, maxEducLevel, oficio)
+    #filter(!is.na(Ingresos_porhora))
   #Variables del modelo. formal indica si paga o no seguridad social.
     
     #Hay algunas categorías en oficio que solo tienen un dato. Más adelante eso 

@@ -39,6 +39,8 @@ DB = readRDS(paste0(path,"Stores/Base_final.rds"))
 DB = DB %>% mutate(sex = ifelse(sex==0, 1, 0))
 #Se calcula el logaritmo natural del salario.
 DB$log_ingresos_porhora = log(DB$Ingresos_porhora)
+DB = DB[!is.na(DB$Ingresos_porhora), ]
+
 
 #Primero un pequeño análisis gráfico
 png(filename = paste0(path, "Views/Scatter_sex_ingresos.png"),
