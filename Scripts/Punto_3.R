@@ -77,6 +77,7 @@ DB$log_ingresos_porhora = log(DB$Ingresos_porhora)
 DB = DB %>% mutate(age_2 = age^2)
 
 lm_age = lm(log_ingresos_porhora ~ age+age_2, DB)
+
 stargazer(lm_age, type = "text") #Se exportan los resultados.
 
 #Se calcula el MSE del modelo.
@@ -95,6 +96,7 @@ Errores = data.frame(Nombres = c("R cuadrado ajustado", "MSE", "RMSE"),
                                      sqrt(MSE_niveles)))
 #Hacia latex.
 xtable::xtable(Errores)
+saveRDS(Errores, paste0(path,"Stores/Punto_3_errores_prediccion.rds"))
 
 #Las predicciones de forma gráfica.
 DB_predict = data.frame(age = DB_aux$age,
@@ -225,6 +227,7 @@ stargazer(c(mean(Bootstrap$t), sd(Bootstrap$t), Percentiles[1], Percentiles[2]),
           column.labels = c("Media", "Error est.", "Perc. 2.5", "Perc. 97.5"),
           align = T)
 
+saveRDS(Matriz_boot, paste0(path,"Stores/Bootstrap_punto_3.rds"))
 
 
 

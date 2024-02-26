@@ -133,6 +133,8 @@ resultados_FWL = data.frame(Método = c("Regresión múltiple", "FWL",
 #En una tabla
 xtable::xtable(resultados_FWL, type = "text")
 
+saveRDS(resultados_FWL, paste0(path,"Stores/FWL_bootstrap_punto_4.rds"))
+
 # Punto c. ----------------------------------------------------------------
 #Se añadirá una interacción entre edad y sex para determinar si la edad que máximiza
 #el salario es diferente según el sexo del trabajador.
@@ -198,7 +200,7 @@ names(IC_male) = NULL
 #Se hace un gráfico de las predicciones, edad máxima e intervalos de confianza por sexo.
 #Primero la predicción sin discriminar.
 lm_aux = lm(log_ingresos_porhora ~ sex+age+age_2 + age*sex + maxEducLevel + 
-               sizeFirm, data = DB)
+               sizeFirm + oficio, data = DB)
 
 #este modelo solo tiene variables categóricas, la única continua es age.
 #Se obtiene una sub base para calcular las modas.
@@ -229,14 +231,14 @@ salario = function(age, female, lm_object, coef){
       perfil_log = lm_object$coefficients["(Intercept)"] + lm_object$coefficients["sex"]+ 
         lm_object$coefficients["age"]*age + lm_object$coefficients["age_2"]*age^2 +
         lm_object$coefficients["sex:age"]*age + coef[[1]] + 
-        coef[[2]] #+ coef[[3]]
+        coef[[2]] + coef[[3]]
       names(perfil_log) = NULL
       
     } else {
       
       perfil_log = lm_object$coefficients["(Intercept)"] + lm_object$coefficients["age"]*age + 
         lm_object$coefficients["age_2"]*age^2 + coef[[1]] + 
-        coef[[2]] #+ coef[[3]]
+        coef[[2]] + coef[[3]]
       names(perfil_log) = NULL
       
     }
@@ -294,7 +296,8 @@ Resultados_boot = data.frame("Género" = c("Hombre", "Mujer"),
                                                   , round(IC_male[2],0)),
                                            paste0(round(IC_female[1],0), ", "
                                                   , round(IC_female[2],0))))
-xtable::xtable(Resultados_boot)                          
+xtable::xtable(Resultados_boot) 
+saveRDS(Resultados_boot, paste0(path,"Stores/Punto_4c_Bootstrap_.rds"))
                                          
 
 
