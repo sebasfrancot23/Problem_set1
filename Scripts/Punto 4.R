@@ -201,8 +201,8 @@ names(IC_male) = NULL
 
 #Se hace un gráfico de las predicciones, edad máxima e intervalos de confianza por sexo.
 #Primero la predicción sin discriminar.
-lm_aux = lm(log_ingresos_porhora ~ sex+age+age_2 + age*sex + maxEducLevel + 
-               sizeFirm + oficio, data = DB)
+lm_aux = lm(log_ingresos_porhora ~ sex+age+age_2 + age*sex + as.factor(maxEducLevel) + 
+               as.factor(sizeFirm) + as.factor(oficio), data = DB)
 
 #este modelo solo tiene variables categóricas, la única continua es age.
 #Se obtiene una sub base para calcular las modas.

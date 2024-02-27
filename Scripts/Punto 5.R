@@ -44,10 +44,10 @@ DB_test = DB[-Train_index,]
 #Se reestiman los modelos con la base de entrenamiento.
 lm_age = lm(log_ingresos_porhora ~ age+age_2, DB_train)
 lm_sex = lm(log_ingresos_porhora ~ sex, DB_train)
-lm_sex_multiple = lm(log_ingresos_porhora ~ sex+age+age_2 + maxEducLevel + 
-                       sizeFirm + oficio, data = DB_train) #Acá se agrega oficio.
-lm_sex_interaccion= lm(log_ingresos_porhora ~ sex+age+age_2 + age*sex + maxEducLevel + 
-               sizeFirm + oficio, data = DB_train)
+lm_sex_multiple = lm(log_ingresos_porhora ~ sex+age+age_2 + as.factor(maxEducLevel) + 
+                       as.factor(sizeFirm) + as.factor(oficio), data = DB_train) #Acá se agrega oficio.
+lm_sex_interaccion= lm(log_ingresos_porhora ~ sex+age+age_2 + age*sex + as.factor(maxEducLevel) + 
+               as.factor(sizeFirm) + as.factor(oficio), data = DB_train)
 
 
 
@@ -69,27 +69,27 @@ RMSE_sex_interaccion = RMSE(prediccion_sex_interaccion,
 #Se plantean otros 5 modelos.
 lm_completo = lm(log_ingresos_porhora ~ sex + age+ 
                    hoursWorkUsual + as.factor(Estrato) + Independiente +
-                   antiguedad_puesto + formal + sizeFirm + maxEducLevel + oficio,
-                    data = DB_train)
+                   antiguedad_puesto + formal + as.factor(sizeFirm) + as.factor(maxEducLevel)
+                 + as.factor(oficio), data = DB_train)
 lm_log_log = lm(log_ingresos_porhora ~ sex + log(age) + 
                   log(hoursWorkUsual) + as.factor(Estrato) + Independiente +
-                  antiguedad_puesto + formal + sizeFirm + maxEducLevel + oficio,
-                data = DB_train)
+                  antiguedad_puesto + formal + as.factor(sizeFirm) + as.factor(maxEducLevel)
+                + as.factor(oficio), data = DB_train)
 lm_polinomios = lm(log_ingresos_porhora ~ sex + poly(age, 4, raw = T) + 
                      poly(hoursWorkUsual, 4, raw = T) + as.factor(Estrato) + Independiente +
-                     poly(antiguedad_puesto, 5, raw = T) + formal + sizeFirm + maxEducLevel +
-                     oficio, data = DB_train)
+                     poly(antiguedad_puesto, 5, raw = T) + formal + as.factor(sizeFirm) + 
+                     as.factor(maxEducLevel) + as.factor(oficio), data = DB_train)
 
 lm_discriminador = lm(log_ingresos_porhora ~ sex + age*sex + 
                         hoursWorkUsual*sex + as.factor(Estrato) + Independiente*sex +
-                        antiguedad_puesto + formal + sizeFirm*sex + maxEducLevel*sex +
-                        oficio, data = DB_train)
+                        antiguedad_puesto + formal + as.factor(sizeFirm)*sex + 
+                        as.factor(maxEducLevel)*sex + as.factor(oficio), data = DB_train)
 
 #Por último, se corre una regresión por segmentos en la edad.
 lm_quiebre = lm(log_ingresos_porhora ~ sex + age + age_segmentada*indicadora + 
                   hoursWorkUsual + as.factor(Estrato) + Independiente +
-                  antiguedad_puesto + formal + sizeFirm + maxEducLevel + 
-                  oficio, data = DB_train)
+                  antiguedad_puesto + formal + as.factor(sizeFirm) + 
+                  as.factor(maxEducLevel) + as.factor(oficio), data = DB_train)
 
 #Predicciones y errores estándar.
 prediccion_completo = predict(lm_completo, newdata = DB_test)
@@ -127,8 +127,8 @@ ctrl = trainControl("LOOCV")
 #Se realiza el proceso de LOOCV:
 CV_completo = train(log_ingresos_porhora ~ sex + age + age_segmentada*indicadora + 
                       hoursWorkUsual + as.factor(Estrato) + Independiente +
-                      antiguedad_puesto + formal + sizeFirm + maxEducLevel + 
-                      oficio, 
+                      antiguedad_puesto + formal + as.factor(sizeFirm) + 
+                      as.factor(maxEducLevel) + as.factor(oficio), 
       data = DB[1:nrow(DB), ], method = "lm", trControl = ctrl)
 
 #Para correr los polinomios se crean las transformaciones de las variables.
@@ -148,8 +148,8 @@ CV_polinomios = train(log_ingresos_porhora ~ sex + age + age_2 + age_3 + age_4 +
                       hoursWorkUsual_4 + as.factor(Estrato) + Independiente + 
                         antiguedad_puesto + antiguedad_puesto_2 + 
                         antiguedad_puesto_3 + antiguedad_puesto_4 +
-                        antiguedad_puesto_5 + formal + sizeFirm + maxEducLevel +
-                        oficio, 
+                        antiguedad_puesto_5 + as.factor(formal) + as.factor(sizeFirm)
+                      + as.factor(maxEducLevel) + as.factor(oficio), 
                       data = DB[1:nrow(DB), ], method = "lm", trControl = ctrl)
 #Se extraen los RMSE de los CV.
 Mejores_modelos = data.frame("Nombres" = c("Lm quiebre", "Polinomios"),
