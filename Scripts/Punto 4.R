@@ -97,7 +97,7 @@ DB$Resid_Ingreso_aux = Ingreso_aux$residuals
 FWL_sex = lm(Resid_Ingreso_aux ~ Resid_sex, data = DB)
 
 #Hacia latex
-stargazer(lm_sex, FWL_sex, type = "text")
+stargazer(lm_sex, FWL_sex, type = "latex", omit = c(FALSE,TRUE))
 
 # Punto b, bootstrap ------------------------------------------------------
 #Se define la función para emplear en bootstrap.
@@ -204,11 +204,11 @@ names(IC_male) = NULL
 #Se hace un gráfico de las predicciones, edad máxima e intervalos de confianza por sexo.
 #Primero la predicción sin discriminar.
 lm_aux = lm(log_ingresos_porhora ~ sex+age+age_2 + age*sex + as.factor(maxEducLevel) + 
-               as.factor(sizeFirm) + as.factor(oficio), data = DB)
+               as.factor(sizeFirm), data = DB)
 
 #este modelo solo tiene variables categóricas, la única continua es age.
 #Se obtiene una sub base para calcular las modas.
-DB_categoricas = DB[,c("sizeFirm", "maxEducLevel", "oficio")]
+DB_categoricas = DB[,c("sizeFirm", "maxEducLevel")]
 
 #Se calcula la moda por variable
 modas = apply(DB_categoricas, 2, function(x){
@@ -221,7 +221,7 @@ modas = apply(DB_categoricas, 2, function(x){
 coeficientes = list()
 for (i in 1:length(modas)){
   #Para buscar el coeficiente.
-  nombre_aux = paste0(names(modas[i]),modas[i])
+  nombre_aux = paste0("as.factor(", names(modas[i]),")", modas[i])
   
   coeficientes[[nombre_aux]] = lm_aux$coefficients[nombre_aux]
 }
@@ -235,14 +235,14 @@ salario = function(age, female, lm_object, coef){
       perfil_log = lm_object$coefficients["(Intercept)"] + lm_object$coefficients["sex"]+ 
         lm_object$coefficients["age"]*age + lm_object$coefficients["age_2"]*age^2 +
         lm_object$coefficients["sex:age"]*age + coef[[1]] + 
-        coef[[2]] + coef[[3]]
+        coef[[2]] #+ coef[[3]]
       names(perfil_log) = NULL
       
     } else {
       
       perfil_log = lm_object$coefficients["(Intercept)"] + lm_object$coefficients["age"]*age + 
         lm_object$coefficients["age_2"]*age^2 + coef[[1]] + 
-        coef[[2]] + coef[[3]]
+        coef[[2]] #+ coef[[3]]
       names(perfil_log) = NULL
       
     }
@@ -250,7 +250,6 @@ salario = function(age, female, lm_object, coef){
 }
 
 #Se evalúa la función en cada observación.
-DB$perfil_w_edad = rep(NA, nrow(DB))
 for (i in 1:nrow(DB)) {
   
   DB[i, "perfil_w_edad"] = salario(DB[i,"age"], DB[i,"sex"] ,
@@ -290,7 +289,8 @@ ggplot(DB, aes(x = age, group = as.factor(sex), color = as.factor(sex))) +
         axis.text.y = element_text(size = 10),
         panel.grid.major = element_blank(),  
         panel.grid.minor = element_blank(), 
-        axis.line = element_line(color = "black", size = 1))
+        axis.line = element_line(color = "black", size = 1),
+        legend.text = element_text(size = 15))
 dev.off()
   
 #En una tabla esos resultados:
