@@ -78,7 +78,7 @@ DB = DB %>% mutate(age_2 = age^2)
 
 lm_age = lm(log_ingresos_porhora ~ age+age_2, DB)
 
-stargazer(lm_age, type = "text") #Se exportan los resultados.
+stargazer(lm_age, type = "latex") #Se exportan los resultados.
 
 #Se calcula el MSE del modelo.
 DB_aux = DB[!is.na(DB$Ingresos_porhora),]
@@ -145,8 +145,7 @@ ggplot(DB_aux, aes(x = age, y = Efecto_marginal)) +
   geom_vline(xintercept = Age_max, linetype = "dashed", color = "red") +
   geom_text(aes(label = ifelse(age == Age_max, paste0(as.character(Age_max), " años")
                                , "")), vjust = -0.3, hjust = -0.2, color = "black") +
-  labs(title = "Semielasticidad del ingreso contra la edad" ,
-       y = "Semielasticidad", x = "Edad") +
+  labs(y = "Semielasticidad", x = "Edad") +
   scale_y_continuous(n.breaks = 6, expand = c(0,0)) +
   scale_x_continuous(n.breaks = 6, expand = c(0,0)) +
   theme(plot.title = element_text(hjust = 0.5, size = 15),

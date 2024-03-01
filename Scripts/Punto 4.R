@@ -64,6 +64,8 @@ dev.off()
 DB = DB[!is.na(DB$Ingresos_porhora),]
 lm_sex =lm(log_ingresos_porhora ~ sex, DB)
 
+stargazer(lm_sex)
+
 # Punto b. ----------------------------------------------------------------
 #Modelo más completo.
 #Se crea la edad al cuadrado.
