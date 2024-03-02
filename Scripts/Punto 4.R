@@ -121,7 +121,7 @@ Function_to_boot = function(data, index){
 }
 
 #Los resultados del bootstrap.
-Resultados_boot_sex = boot(DB, Function_to_boot, R = 10000)
+Resultados_boot_sex = boot(DB, Function_to_boot, R = 100)
 
 #Algunos resultados en una tabla.
 resultados_FWL = data.frame(Método = c("Regresión múltiple", "FWL", 
@@ -190,8 +190,8 @@ Age_max_bootstap_male = function(data, index){
 }
 
 #Se corre el bootstrap.
-Boot_mujer = boot(DB, Age_max_bootstap_female, R = 10000)
-Boot_hombre = boot(DB, Age_max_bootstap_male, R = 10000)
+Boot_mujer = boot(DB, Age_max_bootstap_female, R = 100)
+Boot_hombre = boot(DB, Age_max_bootstap_male, R = 100)
 
 #Los intervalos de confianza al 95%.
 IC_female = quantile(Boot_mujer$t, probs = c(0.025, 0.975))

@@ -30,9 +30,9 @@ set.seed(398759)
 #Para el punto b. se hará un modelo segmentado, así que se crea la variable de 
 #una vez.
 
-Quiebre = 45 #En verdad es arbitrario este número
-DB = DB %>% mutate(age_segmentada = age - Quiebre) %>% 
-  mutate(indicadora = ifelse(age>=Quiebre, 1, 0))
+Quiebre = 50 #En verdad es arbitrario este número
+DB = DB %>% mutate(antiguedad_segmentada = antiguedad_puesto  - Quiebre) %>% 
+  mutate(indicadora = ifelse(antiguedad_puesto>=Quiebre, 1, 0))
 
 #Se divide la muestra entre train y validación.
 Train_index = createDataPartition(y = DB$log_ingresos_porhora, p = 0.7, 
@@ -45,7 +45,7 @@ DB_test = DB[-Train_index,]
 lm_age = lm(log_ingresos_porhora ~ age+age_2, DB_train)
 lm_sex = lm(log_ingresos_porhora ~ sex, DB_train)
 lm_sex_multiple = lm(log_ingresos_porhora ~ sex+age+age_2 + as.factor(maxEducLevel) + 
-                       as.factor(sizeFirm) + as.factor(oficio), data = DB_train) #Acá se agrega oficio.
+                       as.factor(sizeFirm), data = DB_train) #Acá se agrega oficio.
 lm_sex_interaccion= lm(log_ingresos_porhora ~ sex+age+age_2 + age*sex + as.factor(maxEducLevel) + 
                as.factor(sizeFirm) + as.factor(oficio), data = DB_train)
 
@@ -86,7 +86,8 @@ lm_discriminador = lm(log_ingresos_porhora ~ sex + age*sex +
                         as.factor(maxEducLevel)*sex + as.factor(oficio), data = DB_train)
 
 #Por último, se corre una regresión por segmentos en la edad.
-lm_quiebre = lm(log_ingresos_porhora ~ sex + age + age_segmentada*indicadora + 
+lm_quiebre = lm(log_ingresos_porhora ~ sex + age + 
+                  antiguedad_segmentada*indicadora + 
                   hoursWorkUsual + as.factor(Estrato) + Independiente +
                   antiguedad_puesto + formal + as.factor(sizeFirm) + 
                   as.factor(maxEducLevel) + as.factor(oficio), data = DB_train)
@@ -125,7 +126,8 @@ saveRDS(Modelos, paste0(path,"Stores/Resultados_modelos_punto5.rds"))
 ctrl = trainControl("LOOCV")
 
 #Se realiza el proceso de LOOCV:
-CV_completo = train(log_ingresos_porhora ~ sex + age + age_segmentada*indicadora + 
+CV_completo = train(log_ingresos_porhora ~ sex + age + 
+                      antiguedad_segmentada*indicadora + 
                       hoursWorkUsual + as.factor(Estrato) + Independiente +
                       antiguedad_puesto + formal + as.factor(sizeFirm) + 
                       as.factor(maxEducLevel) + as.factor(oficio), 
