@@ -119,6 +119,21 @@ xtable::xtable(Modelos)
 saveRDS(Modelos, paste0(path,"Stores/Resultados_modelos_punto5.rds"))
 
 
+#Se gráfican los errores en el test sample del modelo polinomico.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Punto d. ----------------------------------------------------------------
 #Los mejores dos modelos: polinomio y quiebre.
 
